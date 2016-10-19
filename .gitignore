@@ -1,6 +1,6 @@
 .idea
 build
-lib
+lib/test
 node_modules
 typings
 coverage
