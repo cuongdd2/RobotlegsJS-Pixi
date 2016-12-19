@@ -1,7 +1,11 @@
-const webpack = require('webpack')
-const path = require('path')
+const webpack = require('webpack');
+const path = require('path');
 
 module.exports = (function(options) {
+
+  if (!options) options = {isTest: false};
+
+  var tsconfig = options.isTest ? "tsconfig.test.json" : "tsconfig.json";
 
   return {
     entry: {
@@ -17,16 +21,16 @@ module.exports = (function(options) {
 
     module: {
       rules: [
-        { test: /\.ts$/, loader: "awesome-typescript-loader" },
+        { test: /\.ts$/, loader: "ts-loader?configFileName=" + tsconfig },
         {
-          enforce: 'post',
           test: /^(.(?!\.test))*\.ts$/,
           loader: "istanbul-instrumenter-loader",
           query: {
-            embedSource: true,
+            embedSource: true
           },
+          enforce: "post"
         }
-      ],
+      ]
     },
 
     plugins: [
@@ -35,9 +39,10 @@ module.exports = (function(options) {
     ],
 
     resolve: {
-      extensions: ['.ts', '.js', '.json']
+      extensions: ['.ts', '.js', '.json'],
+      alias: {
+        // sinon: 'sinon/pkg/sinon'
+      }
     }
-
-
   }
-})()
+});

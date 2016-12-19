@@ -1,11 +1,9 @@
 import { inject } from "robotlegs";
 import { CircleView } from "./CircleView"
 import { Mediator } from "../../src/index";
+import { ChildView } from "./ChildView";
 
-export class CircleMediator extends Mediator {
-
-    @inject(CircleView)
-    view: CircleView;
+export class CircleMediator extends Mediator<CircleView> {
 
     initialize()
     {
@@ -15,7 +13,7 @@ export class CircleMediator extends Mediator {
     }
 
     onClick (e) {
-        console.log("clicked!");
+        this.view.parent.addChild(new ChildView());
     }
 
     destroy () {

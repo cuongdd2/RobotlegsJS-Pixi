@@ -1,5 +1,5 @@
-const webpack = require('webpack')
-const path = require('path')
+const webpack = require('webpack');
+const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = (function(options) {
@@ -17,8 +17,7 @@ module.exports = (function(options) {
 
     module: {
       rules: [
-        { test: /\.ts$/, loader: "awesome-typescript-loader" },
-        { test: /node_modules\/pixi\.js/, loader: 'ify' },
+        { test: /\.ts$/, loader: "ts-loader" }
       ]
     },
 

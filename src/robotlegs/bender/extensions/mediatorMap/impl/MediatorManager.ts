@@ -5,7 +5,7 @@
 //  in accordance with the terms of the license agreement accompanying it.
 // ------------------------------------------------------------------------------
 
-import { DisplayObject } from "pixi.js";
+import { DisplayObject, Container } from "pixi.js";
 
 import { IMediatorMapping } from "../api/IMediatorMapping";
 import { MediatorFactory } from "./MediatorFactory";
@@ -50,9 +50,10 @@ export class MediatorManager {
         var displayObject: DisplayObject = <DisplayObject>item;
 
         // Watch Display Object for removal
-        if (displayObject && mapping.autoRemoveEnabled)
-            displayObject.on('removed', this.onRemovedFromStage, this);
-        // displayObject.addEventListener(Event.REMOVED_FROM_STAGE, this.onRemovedFromStage);
+        if (displayObject && mapping.autoRemoveEnabled) {
+            item._onRemovedFromStage = this.onRemovedFromStage.bind(this, item);
+            displayObject.on('removed', item._onRemovedFromStage, this);
+        }
 
         // Synchronize with item life-cycle
         this.initializeMediator(mediator, item);
@@ -63,8 +64,7 @@ export class MediatorManager {
      */
     public removeMediator(mediator: any, item: any, mapping: IMediatorMapping): void {
         if (item instanceof DisplayObject)
-            (<DisplayObject>item).off('removed', this.onRemovedFromStage);
-        // displayObject.removeEventListener(Event.REMOVED_FROM_STAGE, this.onRemovedFromStage);
+            (<DisplayObject>item).off('removed', (<any>item)._onRemovedFromStage);
 
         this.destroyMediator(mediator);
     }
@@ -73,16 +73,16 @@ export class MediatorManager {
     /* Private Functions                                                          */
     /*============================================================================*/
 
-    private onRemovedFromStage(event: any): void {
-        this._factory.removeMediators(event);
+    private onRemovedFromStage(displayObject: any, fromContainer: any): void {
+        this._factory.removeMediators(displayObject);
     }
 
     private initializeMediator(mediator: any, mediatedItem: any): void {
         if ('preInitialize' in mediator)
             mediator.preInitialize();
 
-        if ('viewComponent' in mediator)
-            mediator.viewComponent = mediatedItem;
+        if ('view' in mediator)
+            mediator.view = mediatedItem;
 
         if ('initialize' in mediator)
             mediator.initialize();
@@ -98,10 +98,21 @@ export class MediatorManager {
         if ('destroy' in mediator)
             mediator.destroy();
 
-        if ('viewComponent' in mediator)
-            mediator.viewComponent = null;
+        if ('view' in mediator) {
+            this.destroyView(mediator.view);
+            mediator.view = null;
+        }
 
         if ('postDestroy' in mediator)
             mediator.postDestroy();
+    }
+
+    private destroyView(view: any): void {
+        if (view instanceof Container) {
+            while (view.children.length > 0) {
+                let child = view.removeChildAt(0);
+                this.destroyView(child);
+            }
+        }
     }
 }
