@@ -28,6 +28,6 @@ export { StageObserverExtension } from "./robotlegs/bender/extensions/viewManage
 export { ViewManagerExtension } from "./robotlegs/bender/extensions/viewManager/ViewManagerExtension";
 
 /**
- * Bundles
+ * Bundle
  */
 export { PixiBundle } from "./robotlegs/bender/bundles/pixi/PixiBundle";
